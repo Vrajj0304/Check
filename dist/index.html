@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Countdown & Event Dashboard</title>
+
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@500;700&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" crossorigin href="./assets/index-6zLurZgK.css" />
+
+    <!-- JavaScript Application Modules -->
+    <script type="module" crossorigin src="./assets/index-DgTwgse2.js"></script>
+  </head>
+  <body>
+    <div id="root">
+      <div class="app-container">
+        <!-- Background Lighting -->
+        <div class="studio-spotlight"></div>
+        <div class="subtle-vignette"></div>
+
+        <div class="content-wrapper">
+          <!-- 1. Header Section -->
+          <header class="dashboard-header">
+            <h1 class="dashboard-title">
+              Countdown <span class="text-gradient">Dashboard</span>
+            </h1>
+            <p class="dashboard-subtitle">
+              Track milestones, launches, vacations, and special moments with real-time precision.
+            </p>
+
+            <!-- Quick Stats Pills -->
+            <div class="stats-row">
+              <div class="stat-pill">
+                <span class="stat-number" id="stat-total">0</span>
+                <span class="stat-label">Total Events</span>
+              </div>
+              <div class="stat-pill active-stat">
+                <span class="stat-number" id="stat-active">0</span>
+                <span class="stat-label">Active Timers</span>
+              </div>
+              <div class="stat-pill completed-stat">
+                <span class="stat-number" id="stat-completed">0</span>
+                <span class="stat-label">Arrived / Passed</span>
+              </div>
+            </div>
+          </header>
+
+          <!-- 2. Create Event Form Card -->
+          <section class="form-card">
+            <div class="form-card-header">
+              <div class="form-header-icon">
+                <!-- Stopwatch Timer Symbol -->
+                <svg
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="royalblue"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                >
+                  <circle cx="12" cy="13" r="8" />
+                  <path d="M12 9v4l2.5 2.5" />
+                  <path d="M10 2h4" />
+                  <path d="m19 5-1.5 1.5" />
+                </svg>
+              </div>
+              <div>
+                <h2 class="form-title">Create New Countdown</h2>
+                <p class="form-desc">Set a date and watch the countdown begin immediately.</p>
+              </div>
+            </div>
+
+            <form id="add-event-form" class="add-event-form">
+              <div class="form-grid">
+                <!-- Title Field -->
+                <div class="form-group">
+                  <label for="event-title" class="input-label">Event Title</label>
+                  <input
+                    id="event-title"
+                    type="text"
+                    class="text-input"
+                    placeholder="e.g., Summer Trip, Product Launch, Birthday..."
+                    maxlength="60"
+                  />
+                </div>
+
+                <!-- Target Date & Time Field -->
+                <div class="form-group">
+                  <label for="event-date" class="input-label">Target Date & Time</label>
+                  <input id="event-date" type="datetime-local" class="date-input" />
+                </div>
+
+                <!-- Category Selector -->
+                <div class="form-group">
+                  <label for="event-category" class="input-label">Category</label>
+                  <select id="event-category" class="select-input">
+                    <option value="Celebration">🎉 Celebration</option>
+                    <option value="Work">💼 Work & Launch</option>
+                    <option value="Travel">✈️ Travel & Trip</option>
+                    <option value="Goal">🎯 Milestone / Goal</option>
+                    <option value="Personal">🌟 Personal</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Error Banner -->
+              <div id="form-error" class="error-banner" style="display: none;"></div>
+
+              <!-- Submit Button -->
+              <div class="form-actions">
+                <button type="submit" class="submit-btn">
+                  <span class="btn-icon">＋</span> Add Countdown Timer
+                </button>
+              </div>
+            </form>
+          </section>
+
+          <!-- 3. Dynamic Events Container -->
+          <div id="events-container">
+            <!-- Empty state when no countdowns exist -->
+            <div id="empty-state" class="empty-state-card" style="display: none;">
+              <div class="empty-icon-wrapper">
+                <span class="empty-emoji">⏳</span>
+              </div>
+              <h3 class="empty-title">No Countdowns Scheduled Yet</h3>
+              <p class="empty-text">
+                Your dashboard is clear! Enter an upcoming event above or click the button below to load sample countdowns.
+              </p>
+              <button type="button" class="sample-events-btn" id="load-samples-btn">
+                ⚡ Load Sample Events
+              </button>
+            </div>
+
+            <!-- Grid container for event cards -->
+            <div id="events-grid" class="events-grid"></div>
+          </div>
+
+          <!-- 4. Footer Section -->
+          <footer class="dashboard-footer">
+            <p>Countdown Dashboard • Real-time event tracking with simple, clean JavaScript.</p>
+          </footer>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Card Template (Used by JavaScript to clone cards) -->
+    <template id="card-template">
+      <div class="event-card">
+        <div class="card-top">
+          <span class="category-pill"></span>
+          <button type="button" class="delete-card-btn" title="Delete event">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="3 6 5 6 21 6" />
+              <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+              <line x1="10" y1="11" x2="10" y2="17" />
+              <line x1="14" y1="11" x2="14" y2="17" />
+            </svg>
+          </button>
+        </div>
+
+        <h3 class="event-title"></h3>
+        <div class="event-date-row">
+          <span class="calendar-icon">📅</span>
+          <span class="event-date-text"></span>
+        </div>
+
+        <!-- Active Countdown Display -->
+        <div class="countdown-display">
+          <div class="countdown-box">
+            <span class="countdown-digit day-num">00</span>
+            <span class="countdown-unit">DAYS</span>
+          </div>
+          <span class="countdown-separator">:</span>
+          <div class="countdown-box">
+            <span class="countdown-digit hour-num">00</span>
+            <span class="countdown-unit">HOURS</span>
+          </div>
+          <span class="countdown-separator">:</span>
+          <div class="countdown-box">
+            <span class="countdown-digit min-num">00</span>
+            <span class="countdown-unit">MINS</span>
+          </div>
+          <span class="countdown-separator">:</span>
+          <div class="countdown-box highlight-sec">
+            <span class="countdown-digit sec-num">00</span>
+            <span class="countdown-unit">SECS</span>
+          </div>
+        </div>
+
+        <!-- Event Arrived State Banner -->
+        <div class="event-arrived-badge" style="display: none;">
+          <span class="celebrate-icon">🎉</span>
+          <div class="arrived-content">
+            <strong>The moment has arrived!</strong>
+            <span>This event is happening now or has passed.</span>
+          </div>
+        </div>
+
+        <!-- Card Footer -->
+        <div class="card-footer">
+          <span class="status-indicator">
+            <span class="status-dot"></span>
+            <span class="status-text"></span>
+          </span>
+        </div>
+      </div>
+    </template>
+  </body>
+</html>
